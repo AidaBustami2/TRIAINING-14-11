@@ -24,7 +24,7 @@ public class WorkerService {
     }
 
     public String work(Task task) {
-        if (task.getStatus() > 1)
+        if ((task.getStatus() != Task.Taskstatus.Pending ) && (task.getStatus() != Task.Taskstatus.In_Progress))
             return "task already finished ";
         List<Thread> threadList = threadservice.findByBusy(false);
         if (threadList.size() > 0) {
@@ -35,7 +35,7 @@ public class WorkerService {
                 currentThread.setBusy(true);
                 currentThread.setTask(currentTask);
                 threadservice.save(currentThread);
-                currentTask.setStatus(1);
+                currentTask.setStatus(Task.Taskstatus.In_Progress);
                 currentTask.setThread(currentThread);
                 taskservice.save(currentTask);
                 try {
@@ -43,7 +43,7 @@ public class WorkerService {
                 } catch (Exception e) {
                     System.out.print(e);
                 }
-                currentTask.setStatus(2);
+                currentTask.setStatus(Task.Taskstatus.Completed);
                 currentTask.getThread().setBusy(false);
                 threadservice.save(currentTask.getThread());
                 currentTask.setThread(null);
