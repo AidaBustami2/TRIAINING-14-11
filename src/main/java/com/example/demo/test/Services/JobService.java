@@ -1,5 +1,5 @@
 package com.example.demo.test.Services;
-
+import com.example.demo.test.Models.ElementNotFoundException;
 import com.example.demo.test.Models.Machine;
 import com.example.demo.test.Models.Task;
 import com.example.demo.test.Models.User;
@@ -67,5 +67,21 @@ public class JobService {
         if (threadService.count() == 0)
             threadService.intilaize();
         return taskservice.save(task);
+    }
+    public Machine addTask(Task task1, Long userId, Long machineId) {
+        Task task = saveTask(task1);
+        Optional<User> optionalUser = findUser(userId);
+        if (optionalUser.isPresent()) {
+            Optional<Machine> optionalMachine = findMachine(machineId);
+            if (optionalMachine.isPresent()) {
+                addTaskByUser(optionalUser.get(), task);
+                addMachineByUser(optionalMachine.get(), optionalUser.get());
+                return addTaskToMachine(task, optionalMachine.get());
+            } else { //"machine does not exist";
+                throw new ElementNotFoundException("machine does not exist");
+            }
+        } else { //"machine does not exist";
+            throw new ElementNotFoundException("user does not exist");
+        }
     }
 }
